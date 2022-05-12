@@ -20,6 +20,7 @@ public class Board
                 Cells.Add(new Cell(i,j));
             }
         }
+        State = gameState.Active;
     }
     public void SetMines()
     {
@@ -70,6 +71,8 @@ public class Board
                     }
                     if (cell.Value == 0)
                         RevealAdjacentCells(coords);
+                    if (HaveYouWon())
+                        State = gameState.Win;
                 }
             }
         }
@@ -99,5 +102,13 @@ public class Board
             else if (cell.State == cellState.Flagged)
                 cell.State = cellState.Hidden;
         }
+    }
+    private bool HaveYouWon()
+    {
+        int revealedCells = Cells.Where(c => c.State == cellState.Revealed).Count();
+        if (revealedCells == (RowsAmount * ColumnsAmount - MinesAmount))
+            return true;
+        else
+            return false;
     }
 }
