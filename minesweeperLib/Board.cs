@@ -25,8 +25,13 @@ public class Board
     {
         for (int i = 0; i < MinesAmount; i ++)
         {
-            Cell cell = Cells.Where(c => c.Coords == GetRandomCoords() && c.Value != -1).First();
-            cell.Value = MINE;
+            var coords = GetRandomCoords();
+            Console.WriteLine($"Mine at: ({coords.Item1}, {coords.Item2}) ");
+            var cell = Cells.Where(c => c.Coords == coords && c.Value != -1).FirstOrDefault();
+            if (cell != null)
+                cell.Value = MINE;
+            else
+                continue;
         }
     }
     private (int,int) GetRandomCoords()
@@ -86,10 +91,13 @@ public class Board
 
     public void FlagCell((int,int) coords)
     {
-        Cell cell = Cells.Where(c => c.Coords == coords).First();
-        if (cell.State == cellState.Hidden)
-            cell.State = cellState.Flagged;
-        else if (cell.State == cellState.Flagged)
-            cell.State = cellState.Hidden;
+        if (coords.Item1 < RowsAmount && coords.Item2 < ColumnsAmount)
+        {
+            Cell cell = Cells.Where(c => c.Coords == coords).First();
+            if (cell.State == cellState.Hidden)
+                cell.State = cellState.Flagged;
+            else if (cell.State == cellState.Flagged)
+                cell.State = cellState.Hidden;
+        }
     }
 }
