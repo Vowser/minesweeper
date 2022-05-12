@@ -39,26 +39,46 @@ public class Board
     }
     public void RevealCell((int,int) coords)
     {
-        Cell cell = Cells.Where(c => c.Coords == coords).First();
-        cell.State = cellState.Revealed;
-        if (cell.Value == MINE)
+        if (coords.Item1 < RowsAmount && coords.Item2 < ColumnsAmount)
         {
-            State = gameState.Lose;
-        }
-        else if (coords.Item1 < RowsAmount && coords.Item2 < ColumnsAmount)
-        {
-            for (int i = coords.Item1-1; i <= coords.Item1 + 1; i++)
+            Cell cell = Cells.Where(c => c.Coords == coords).First();
+            if (cell.State == cellState.Hidden)
             {
-                for (int j = coords.Item2-1; j <= coords.Item2 + 1; j++)
+                cell.State = cellState.Revealed;
+                if (cell.Value == MINE)
+                    State = gameState.Lose;
+                else 
                 {
-                    if (i >= 0 && j >= 0 && i < RowsAmount && j < ColumnsAmount)
+                    for (int i = coords.Item1-1; i <= coords.Item1 + 1; i++)
                     {
-                        Cell adjacentCell = Cells.Where(c => c.Coords == (i,j)).First();
-                        if (adjacentCell.Value == MINE)
+                        for (int j = coords.Item2-1; j <= coords.Item2 + 1; j++)
                         {
-                            cell.Value++;
+                            if (i >= 0 && j >= 0 && i < RowsAmount && j < ColumnsAmount)
+                            {
+                                Cell adjacentCell = Cells.Where(c => c.Coords == (i,j)).First();
+                                if (adjacentCell.Value == MINE)
+                                {
+                                    cell.Value++;
+                                }
+                            }
                         }
                     }
+                    if (cell.Value == 0)
+                        RevealAdjacentCells(coords);
+                }
+            }
+        }
+    }
+
+    public void RevealAdjacentCells((int,int) coords)
+    {
+        for (int i = coords.Item1-1; i <= coords.Item1 + 1; i++)
+        {
+            for (int j = coords.Item2-1; j <= coords.Item2 + 1; j++)
+            {
+                if (i >= 0 && j >= 0 && i < RowsAmount && j < ColumnsAmount)
+                {
+                    RevealCell(new (i, j));
                 }
             }
         }
